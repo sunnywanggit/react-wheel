@@ -7,6 +7,13 @@ function render(vnode,container) {
 }
 
 function _render(vnode, container) {
+    // 如果是组件
+    if(typeof  vnode === 'function'){
+        let dom = createComponent(vnode.tag,vnode.attrs)
+        return container.appendChild(dom)
+
+    }
+
     //如果最后的叶子节点是一个字符串
     if (typeof vnode === 'string' || typeof vnode === 'number') {
         return container.appendChild(document.createTextNode(vnode))
@@ -22,6 +29,11 @@ function _render(vnode, container) {
         }
         container.appendChild(dom)
     }
+
+}
+
+//constructor 传进来的第一个参数是构造函数
+function createComponent(constructor,attrs) {
 
 }
 

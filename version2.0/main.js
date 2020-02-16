@@ -1,23 +1,24 @@
 import reactWheel from './lib/react-wheel'
 import reactWheelDom from './lib/react-wheel-dom'
 
-let name = 'wangergou'
 
-function cliBtn() {
-    console.log('cliBtn')
+class App extends reactWheel.Component {
+    render() {
+        return (
+            <div className="wrapper">
+                <h1 className="title">wangergou <span>hello</span></h1>
+                <Job/>
+            </div>
+        )
+    }
 }
 
-let objStyle = {
-    color: 'red'
+class Job extends reactWheel.Component {
+    render() {
+        return (
+            <div className="job">我的工作是前端工程师</div>
+        )
+    }
 }
 
-
-// jsx 会被 createElement 编译的到一个具有dom树结构的json对象，被编译出来的vnode 就叫做虚拟dom
-let vnode = (
-    <div className="div">
-        <h1 style={objStyle}>hello{name}</h1>
-        <button onClick={cliBtn}>clickme</button>
-    </div>
-)
-
-reactWheelDom.render(vnode, document.querySelector('#app'))
+reactWheelDom.render(<App/>, document.querySelector('#app'))

@@ -1,25 +1,28 @@
-//渲染虚拟dom
-
-function render(vnode,container) {
-    // 在每一次渲染之前先清空上一次渲染进去的东西,避免重复
+function render(vnode, container) {
+    //在再次将内容插入真实dom之前，先将dom树清空
     container.innerHTML = ''
-    _render(vnode,container)
+    _render(vnode, container)
 }
 
 function _render(vnode, container) {
-    // 如果是组件
-    if(typeof  vnode === 'function'){
-        let dom = createComponent(vnode.tag,vnode.attrs)
-        return container.appendChild(dom)
+    let dom = createDomfromVnode(vnode)
+    container.appendChild(dom)
+}
 
-    }
+function createDomfromVnode(vnode) {
 
-    //如果最后的叶子节点是一个字符串
     if (typeof vnode === 'string' || typeof vnode === 'number') {
-        return container.appendChild(document.createTextNode(vnode))
+        return document.createTextNode(vnode)
     }
 
     if (typeof vnode === 'object') {
+
+        // 如果标签是一个函数（组件）的时候我们如何去做
+        if (typeof vnode.tag === 'function') {
+            let dom = createComponent(vnode.tag, vnode.attrs)
+            return dom
+        }
+
         let dom = document.createElement(vnode.tag)
         setAttribute(dom, vnode.attrs)
         if (vnode.children && Array.isArray(vnode.children)) {
@@ -27,14 +30,19 @@ function _render(vnode, container) {
                 _render(vnodeChild, dom)
             })
         }
-        container.appendChild(dom)
+        return dom
     }
 
 }
 
-//constructor 传进来的第一个参数是构造函数
-function createComponent(constructor,attrs) {
 
+//constructor 传进来的第一个参数是构造函数
+function createComponent(constructor, attrs) {
+    let component = new constructor(attrs)
+    let vnode = component.render()
+    let dom = createDomfromVnode(vnode)
+    component.$root = dom
+    return dom
 }
 
 function setAttribute(dom, attrs) {

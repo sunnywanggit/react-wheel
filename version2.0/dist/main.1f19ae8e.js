@@ -168,43 +168,52 @@ exports.default = void 0;
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-//渲染虚拟dom
 function render(vnode, container) {
-  // 在每一次渲染之前先清空上一次渲染进去的东西,避免重复
+  //在再次将内容插入真实dom之前，先将dom树清空
   container.innerHTML = '';
 
   _render(vnode, container);
 }
 
 function _render(vnode, container) {
-  // 如果是组件
-  if (typeof vnode === 'function') {
-    var dom = createComponent(vnode.tag, vnode.attrs);
-    return container.appendChild(dom);
-  } //如果最后的叶子节点是一个字符串
+  var dom = createDomfromVnode(vnode);
+  container.appendChild(dom);
+}
 
-
+function createDomfromVnode(vnode) {
   if (typeof vnode === 'string' || typeof vnode === 'number') {
-    return container.appendChild(document.createTextNode(vnode));
+    return document.createTextNode(vnode);
   }
 
   if (_typeof(vnode) === 'object') {
-    var _dom = document.createElement(vnode.tag);
+    // 如果标签是一个函数（组件）的时候我们如何去做
+    if (typeof vnode.tag === 'function') {
+      var _dom = createComponent(vnode.tag, vnode.attrs);
 
-    setAttribute(_dom, vnode.attrs);
+      return _dom;
+    }
+
+    var dom = document.createElement(vnode.tag);
+    setAttribute(dom, vnode.attrs);
 
     if (vnode.children && Array.isArray(vnode.children)) {
       vnode.children.forEach(function (vnodeChild) {
-        _render(vnodeChild, _dom);
+        _render(vnodeChild, dom);
       });
     }
 
-    container.appendChild(_dom);
+    return dom;
   }
 } //constructor 传进来的第一个参数是构造函数
 
 
-function createComponent(constructor, attrs) {}
+function createComponent(constructor, attrs) {
+  var component = new constructor(attrs);
+  var vnode = component.render();
+  var dom = createDomfromVnode(vnode);
+  component.$root = dom;
+  return dom;
+}
 
 function setAttribute(dom, attrs) {
   for (var key in attrs) {
@@ -256,10 +265,17 @@ var App =
 function (_reactWheel$Component) {
   _inherits(App, _reactWheel$Component);
 
-  function App() {
+  function App(props) {
+    var _this;
+
     _classCallCheck(this, App);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(App).apply(this, arguments));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
+    _this.state = {
+      name: 'wangergou',
+      job: '前端开发工程师'
+    };
+    return _this;
   }
 
   _createClass(App, [{
@@ -269,7 +285,9 @@ function (_reactWheel$Component) {
         className: "wrapper"
       }, _reactWheel.default.createElement("h1", {
         className: "title"
-      }, "wangergou ", _reactWheel.default.createElement("span", null, "hello")), _reactWheel.default.createElement(Job, null));
+      }, "hello ", _reactWheel.default.createElement("span", null, this.state.name)), _reactWheel.default.createElement(Job, {
+        job: this.state.job
+      }));
     }
   }]);
 
@@ -292,7 +310,7 @@ function (_reactWheel$Component2) {
     value: function render() {
       return _reactWheel.default.createElement("div", {
         className: "job"
-      }, "\u6211\u7684\u5DE5\u4F5C\u662F\u524D\u7AEF\u5DE5\u7A0B\u5E08");
+      }, "\u6211\u7684\u5DE5\u4F5C\u662F", this.props.job);
     }
   }]);
 
@@ -328,7 +346,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61548" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58738" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
